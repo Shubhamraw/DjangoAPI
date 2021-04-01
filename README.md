@@ -96,7 +96,5 @@ neurons to the neural network. This can be used to check the user application on
 such as loan_amount, applicant_income, credit_history etc. The model already learned from the data so it can be able
 to approve or reject the application applying for loan.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
-
 
 
