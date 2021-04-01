@@ -1,0 +1,11 @@
+source /home/shubham/anaconda3/bin/activate
+conda activate base
+
+django-admin startproject project_name
+
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
+python manage.py createsuperuser
+
+django-admin startapp app_name
