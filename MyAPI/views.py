@@ -1,44 +1,39 @@
-from django.shortcuts import render
-#from . forms import MyForm
+# from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from django.core import serializers
 from rest_framework.response import Response
-from rest_framework import status
 from django.http import JsonResponse
+from rest_framework import status
 from rest_framework.parsers import JSONParser
 from . models import approvals
 from . serializers import approvalsSerializers
 from pickle import load
 import json
+import os
+
+import pandas as pd
 import numpy as np
 from sklearn import preprocessing
 from sklearn.preprocessing import MinMaxScaler
-import pandas as pd
 from tensorflow.keras.models import load_model
+
+dir = os.path.dirname(__file__)
 
 
 class ApprovalsView(viewsets.ModelViewSet):
 	queryset = approvals.objects.all()
 	serializer_class = approvalsSerializers
 
-def myform(request):
-	if request.method=="POST":
-		form = MyForm(request.POST)
-		if form.is_valid():
-			myform = form.save(commit=False)
-		else:
-			form = MyForm()
-		
+
 @api_view(["POST"])
 def approvereject(request):
 	try:
-		mdl= load_model("/home/shubham/Desktop/desktop/github copied/check api/DjangoAPI/MyAPI/loan_model.h5")
-		#mydata=pd.read_excel('/Users/sahityasehgal/Documents/Coding/bankloan/test.xlsx')
+		mdl= load_model(dir+"/loan_model.h5")
 		mydata=request.data
 		unit=np.array(list(mydata.values()))
 		unit=unit.reshape(1,-1)
-		scaler=load(open("/home/shubham/Desktop/desktop/github copied/check api/DjangoAPI/MyAPI/scaler.pkl", 'rb'))
+		scaler=load(open(dir+"/scaler.pkl", 'rb'))
 		X=scaler.transform(unit)
 		print(X)
 		y_pred=mdl.predict(X)
@@ -46,6 +41,6 @@ def approvereject(request):
 		y_pred=(y_pred>0.58)
 		newdf=pd.DataFrame(y_pred, columns=['Status'])
 		newdf=newdf.replace({True:'Approved', False:'Rejected'})
-		return JsonResponse('Your Status is {}'.format(newdf), safe=False)
+		return JsonResponse(f'{newdf}. Thank you',safe=False)
 	except ValueError as e:
 		return Response(e.args[0], status.HTTP_400_BAD_REQUEST)
